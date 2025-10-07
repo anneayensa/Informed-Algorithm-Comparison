@@ -1,18 +1,5 @@
-
+import grid
 import heapq
-
-grid = [
-    [0, 0, 0, 1, 0, 0, 0],
-    [1, 1, 0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0, 1, 0],
-    [0, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 0],
-]
-
-start = (0, 0)
-goal = (4, 6)
-ROWS, COLS = len(grid), len(grid[0])
-moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
 
 def heuristic(a, b):
@@ -106,4 +93,5 @@ def show_path(path):
 
 if path:
     show_path(path)
+
 
