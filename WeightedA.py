@@ -84,14 +84,14 @@ if __name__ == "__main__":
     w1, w2 = 1.0, 2.0
     path, expanded = AStarSearch(start, goal, w1, w2)
 
-    print(f"Weighted A* con w1={w1}, w2={w2}")
+    print(f"Weighted A*: w1={w1}, w2={w2}")
     if path:
-        print(f"Camino encontrado ({len(path)} pasos):")
+        print(f"Path found in ({len(path)} steps):")
         print(path)
         show_path(path)
     else:
-        print("No se encontró camino.")
-    print(f"Nodos explorados: {expanded}")
+        print("No path found.")
+    print(f"Nodes explored: {expanded}")
 
 
 
