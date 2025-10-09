@@ -1,8 +1,11 @@
 import math
 import grid
 
+goal = grid.goal
+grid_data = grid.grid
+start = grid.start
+
 def h(node):
-    goal = grid.goal
     return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 def expand(node):
@@ -11,40 +14,40 @@ def expand(node):
     neighbors = []
     for dx, dy in moves:
         nx, ny = x + dx, y + dy
-        if 0 <= nx < len(grid.grid) and 0 <= ny < len(grid.grid[0]) and grid.grid[nx][ny] == 0:
+        if 0 <= nx < len(grid_data) and 0 <= ny < len(grid_data[0]) and grid_data[nx][ny] == 0:
             neighbors.append((nx, ny))
     return neighbors
 
-def cost(node1, node2):
-    return 1
-
 FOUND = object()
 
-def Search(node, g, threshold, path):
+def Search(node, g, threshold, path, visited):
     f = g + h(node)
     if f > threshold:
         return f
-    if node == grid.goal:
+    if node == goal:
         return FOUND
     
     min_exceed = math.inf
     for child in expand(node):
-        if child not in path: 
+        if child not in visited:
             path.append(child)
-            temp = Search(child, g + cost(node, child), threshold, path)
+            visited.add(child)
+            temp = Search(child, g + 1, threshold, path, visited)
             if temp is FOUND:
                 return FOUND
             if temp < min_exceed:
                 min_exceed = temp
             path.pop()
+            visited.remove(child)
     return min_exceed
 
 def IDAStar():
-    threshold = h(grid.start)
-    path = [grid.start]
+    threshold = h(start)
+    path = [start]
+    visited = {start}
 
     while True:
-        temp = Search(grid.start, 0, threshold, path)
+        temp = Search(start, 0, threshold, path, visited)
         if temp is FOUND:
             return path
         if temp == math.inf:
@@ -58,20 +61,14 @@ if camino:
     print(camino)
     print(f"Path length: {len(camino)-1}")
 
-
-    for i in range(len(grid.grid)):
-        row = ""
-        for j in range(len(grid.grid[0])):
-            if (i, j) == grid.start:
-                row += "S "
-            elif (i, j) == grid.goal:
-                row += "G "
-            elif (i, j) in camino:
-                row += "· "
-            elif grid.grid[i][j] == 1:
-                row += "█ "
-            else:
-                row += "  "
-        print(row)
+    for i, row in enumerate(grid_data):
+        print("".join(
+            "S " if (i, j) == start else
+            "G " if (i, j) == goal else
+            "* " if (i, j) in camino else
+            "█ " if cell == 1 else
+            "· "
+            for j, cell in enumerate(row)
+        ))
 else:
     print("❌ No se encontró ningún camino.")
