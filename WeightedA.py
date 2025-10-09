@@ -1,5 +1,5 @@
 import heapq
-from grapch2 import graph, start, goal, h_values  
+from graph2 import graph, start, goal, h_values  
 
 class Node:
     def __init__(self, state, parent=None, g=0, h=0):
@@ -71,6 +71,7 @@ if __name__ == "__main__":
     else:
         print("No path found.")
     print(f"Nodes expanded: {expanded}")
+
 
 
 
