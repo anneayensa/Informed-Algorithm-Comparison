@@ -1,41 +1,38 @@
+
 import heapq
+from grid import grid, start, goal   
 
-# --- Datos del problema ---
-grid = [
-    [0, 0, 0, 1, 0, 0, 0],
-    [1, 1, 0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0, 1, 0],
-    [0, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 0],
-]
-start = (0, 0)
-goal  = (4, 6)
+#manhattan distance 
+def distancia(a, b):
+    fila1, col1 = a
+    fila2, col2 = b
+    return abs(fila1 - fila2) + abs(col1 - col2)
 
-# --- Heurística (distancia Manhattan) ---
-def h(a, b):
-    (r1, c1), (r2, c2) = a, b
-    return abs(r1 - r2) + abs(c1 - c2)
+#neighbours near the position:up,down,left,right
+def obtener_vecinos(grid, posicion):
+    fila, col = posicion
+    movimientos = [(1,0), (-1,0), (0,1), (0,-1)]
+    vecinos = []
 
-# --- Vecinos válidos (4 direcciones) ---
-def vecinos(grid, pos):
-    r, c = pos
-    pasos = [(1,0), (-1,0), (0,1), (0,-1)]
-    for dr, dc in pasos:
-        nr, nc = r + dr, c + dc
-        if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]) and grid[nr][nc] == 0:
-            yield (nr, nc)
+    for df, dc in movimientos:
+        nf, nc = fila + df, col + dc
+        if 0 <= nf < len(grid) and 0 <= nc < len(grid[0]) and grid[nf][nc] == 0:
+            vecinos.append((nf, nc))
+    return vecinos
 
-# --- Greedy Best-First Search ---
-def GreedyBestFirst(grid, start, goal):
-    frontera = []                                 # PriorityQueue (ordenada por h)
-    heapq.heappush(frontera, (h(start, goal), start))
-    padres = {start: None}                        # para reconstruir camino
-    explorados = set()
+# Greedy Algorithm
+def greedy_best_first(grid, start, goal):
+    frontera = []
+    heapq.heappush(frontera, (distancia(start, goal), start))
+
+    padres = {start: None}   
+    visitados = set()
 
     while frontera:
-        _, actual = heapq.heappop(frontera)       # saca el de menor h
-        if actual == goal:                        # si es el objetivo → fin
-            # reconstruir camino
+       
+        _, actual = heapq.heappop(frontera)
+
+        if actual == goal:
             camino = []
             while actual is not None:
                 camino.append(actual)
@@ -43,18 +40,43 @@ def GreedyBestFirst(grid, start, goal):
             camino.reverse()
             return camino
 
-        explorados.add(actual)                    # marca como explorado
-        for vecino in vecinos(grid, actual):      # expande vecinos
-            if vecino not in explorados and vecino not in padres:
+        visitados.add(actual)
+
+       
+        for vecino in obtener_vecinos(grid, actual):
+            if vecino not in visitados and vecino not in padres:
                 padres[vecino] = actual
-                heapq.heappush(frontera, (h(vecino, goal), vecino))
+                heapq.heappush(frontera, (distancia(vecino, goal), vecino))
 
-    return None                                   # si no encuentra solución
+    return None 
 
-# --- Ejecutar ---
-camino = GreedyBestFirst(grid, start, goal)
+
+#show the grid with the path
+def mostrar_camino(grid, camino, start, goal):
+    for fila in range(len(grid)):
+        for col in range(len(grid[0])):
+            pos = (fila, col)
+            if pos == start:
+                print("S", end=" ")
+            elif pos == goal:
+                print("G", end=" ")
+            elif grid[fila][col] == 1:
+                print("-", end=" ")
+            elif pos in camino:
+                print("*", end=" ")
+            else:
+                print(".", end=" ")
+        print()
+    print()
+
+
+
+#result
+camino = greedy_best_first(grid, start, goal)
+
 if camino:
     print("Camino encontrado:", camino)
-    print("Longitud:", len(camino) - 1)
+    mostrar_camino(grid, camino, start, goal)
+    print("Longitud del camino:", len(camino) - 1)
 else:
     print("No hay camino posible.")
